@@ -3,7 +3,7 @@ const projectDB = require('./data/helpers/projectModel');
 const router = express.Router();
 
 router.post('/', validateProject, (req, res) => {
-	res.status(201).json(req);
+	res.status(201).json(req.project);
 });
 
 router.get('/', (req, res) => {
@@ -16,7 +16,7 @@ router.get('/', (req, res) => {
 			res.status(500).json({message: 'Error retrieving users'});
 		});
 });
-router.get('/id/actions', validateProjectID, (req, res) => {
+router.get('/:id/actions', validateProjectID, (req, res) => {
 	projectDB
 		.getProjectActions()
 		.then(projects => {
@@ -63,19 +63,20 @@ function validateProject(req, res, next) {
 		? res.status(400).json({message: 'missing required name field'})
 		: !req.body.description
 		? res.status(400).json({message: 'missing project description field'})
-		: req.body.completed
-		? (req.body.completed = true)
-		: (req.body.completed = false);
-	projectDB
-		.insert(req.body)
-		.then(user => {
-			req.user = user;
-			next();
-		})
-		.catch(error => {
-			res.status(500).json({message: 'Error retrieving user project info'});
-		});
+		: // : req.body.completed
+		  // ? (req.body.completed = true)
+		  // : (req.body.completed = false);
+		  projectDB
+				.insert(req.body)
+				.then(project => {
+					req.project = project;
+					next();
+				})
+				.catch(error => {
+					res.status(500).json({message: 'Error retrieving user project info'});
+				});
 }
+module.exports = router;
 
 // | Field       | Data Type | Metadata
 // | ----------- | --------- | --------------------------------------------------------------------------- |

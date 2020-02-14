@@ -11,7 +11,7 @@ server.use(cors());
 
 //routes-endpoints
 server.use('/api/projects', logger, projectRouter);
-server.use('/api/projects', logger, actionsRouter);
+server.use('/api/actions', logger, actionsRouter);
 server.get('/', (req, res) => {
 	res.send(`<h2>The server is online and happy to see you!</h2>`);
 });

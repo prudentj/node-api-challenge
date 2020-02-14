@@ -4,7 +4,7 @@ const projectDB = require('./data/helpers/projectModel');
 const router = express.Router();
 
 router.post('/', validateAction, (req, res) => {
-	res.status(201).json(req);
+	res.status(201).json(req.action);
 });
 
 router.get('/', (req, res) => {
@@ -75,6 +75,7 @@ function validateAction(req, res, next) {
 			res.status(500).json({message: 'Error retrieving user action info'});
 		});
 }
+module.exports = router;
 
 // | Field       | Data Type | Metadata                                                                                         |
 // | ----------- | --------- | ------------------------------------------------------------------------------------------------ |
