@@ -17,31 +17,33 @@ router.get('/', (req, res) => {
 		});
 });
 router.get('/:id/actions', validateProjectID, (req, res) => {
-	projectDB
-		.getProjectActions()
-		.then(projects => {
-			res.status(200).json(projects);
-		})
-		.catch(error => {
-			res.status(500).json({message: 'Error retrieving users'});
-		});
+	res.status(200).json(req.project.actions);
 });
 router.get('/:id', validateProjectID, (req, res) => {
 	res.status(200).json(req.project);
 });
-router.put('/:id', validateProjectID, validateProject, (req, res) => {
-	projectDB
-		.update(req.params.id, req.body)
-		.then(project => {
-			res.status(200).json({project});
-		})
-		.catch(error => {
-			res.status(500).json({error: 'Failed to update project'});
-		});
+router.put('/:id', validateProjectID, (req, res) => {
+	!req.body
+		? res.status(400).json({message: 'missing project data'})
+		: !req.body.name
+		? res.status(400).json({message: 'missing required name field'})
+		: !req.body.description
+		? res.status(400).json({message: 'missing project description field'})
+		: projectDB
+				.update(req.params.id, req.body)
+				.then(project => {
+					res.status(200).json({project});
+				})
+				.catch(error => {
+					res.status(500).json({error: 'Failed to update project'});
+				});
 });
 
 router.delete('/:id', validateProjectID, (req, res) => {
-	req.status(200).json(req.project);
+	projectDB
+		.remove(req.project.id)
+		.then(res.status(200).json({message: 'Project Deleted'}))
+		.catch(res.status(500).json({error: 'Failed to remove Project'}));
 });
 
 //middleware
@@ -54,7 +56,7 @@ function validateProjectID(req, res, next) {
 				? next()
 				: res.status(400).json({error: 'User id not formated correctly'});
 		})
-		.catch(error => res.status(404).json({error: error}));
+		.catch(error => res.status(404).json({error: 'Project does not exist!'}));
 }
 function validateProject(req, res, next) {
 	!req.body

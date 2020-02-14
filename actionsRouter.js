@@ -4,7 +4,7 @@ const projectDB = require('./data/helpers/projectModel');
 const router = express.Router();
 
 router.post('/', validateAction, (req, res) => {
-	res.status(201).json(req.action);
+	res.status(201).json({message: 'post successful'});
 });
 
 router.get('/', (req, res) => {
@@ -32,7 +32,10 @@ router.put('/:id', validateActionID, validateAction, (req, res) => {
 });
 
 router.delete('/:id', validateActionID, (req, res) => {
-	req.status(200).json(req.action);
+	actionDB
+		.remove(req.action.id)
+		.then(res.status(200).json({message: 'Action Deleted'}))
+		.catch(res.status(500).json({error: 'Failed to remove action'}));
 });
 
 //middleware
@@ -50,8 +53,8 @@ function validateActionID(req, res, next) {
 function validateAction(req, res, next) {
 	!req.body
 		? res.status(400).json({message: 'missing action data'})
-		: !req.body.id
-		? res.status(400).json({message: 'missing required id field'})
+		: !req.body.project_id
+		? res.status(400).json({message: 'missing required project_id '})
 		: projectDB.get(req.body.id) === null
 		? res.status(400).json({message: 'not a valid project id'})
 		: !req.body.description
